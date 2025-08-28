@@ -1,6 +1,6 @@
 # Calculator App (Example for CI/CD Exam)
 
-Pure-Python calculator logic + small stateful CalculatorApp + healthcheck API.....
+Pure-Python calculator logic + small stateful CalculatorApp + healthcheck API.....!
 
 ## Run unit/integration tests
 ```bash
