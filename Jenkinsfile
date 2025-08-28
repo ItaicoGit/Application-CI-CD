@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // BUILDING DOCKER CONTAINER  
-                    sh 'docker build -t $ECR_REPO:$IMAGE_TAG .'
+                    sh 'docker build -t itai1/app:pr-null-6 .'
                 }
             }
         }
@@ -22,7 +22,7 @@ pipeline {
             steps {
                 script {
                     // CI unit test
-                    sh 'docker run --rm $ECR_REPO:$IMAGE_TAG npm test'  // אם אתה עובד עם Node.js למשל
+                    sh 'docker run --rm itai1/app:pr-null-6 npm test'  
                 }
             }
         }
@@ -43,7 +43,7 @@ pipeline {
 
     post {
         always {
-            cleanWs() // לנקות את ה-workspace בסוף
+            cleanWs()
         }
     }
 }
