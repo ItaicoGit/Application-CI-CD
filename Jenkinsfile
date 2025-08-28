@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        ECR_REPO = "your_ecr_repo"    // שם ה-ECR שלך
-        AWS_REGION = "us-east-1"      // אזור ה-AWS שלך
-        AWS_ACCOUNT_ID = "123456789012"  // מזהה החשבון שלך ב-AWS
-        IMAGE_TAG = "pr-${env.CHANGE_ID}-${BUILD_NUMBER}"  // תגית דינמית ל-PR
+        ECR_REPO = "itai1/app"   
+        AWS_REGION = "us-east-1"     
+        AWS_ACCOUNT_ID = "992382545251"  
+        IMAGE_TAG = "pr-${env.CHANGE_ID}-${BUILD_NUMBER}"  
     }
 
     stages {
