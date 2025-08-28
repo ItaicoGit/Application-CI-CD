@@ -1,37 +1,49 @@
 pipeline {
-  agent any
+    agent any
 
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-        sh 'echo "Checked out $BRANCH_NAME"'
-      }
+    environment {
+        ECR_REPO = "your_ecr_repo"    // שם ה-ECR שלך
+        AWS_REGION = "us-east-1"      // אזור ה-AWS שלך
+        AWS_ACCOUNT_ID = "123456789012"  // מזהה החשבון שלך ב-AWS
+        IMAGE_TAG = "pr-${env.CHANGE_ID}-${BUILD_NUMBER}"  // תגית דינמית ל-PR
     }
 
-    stage('CI on PR') {
-      when { changeRequest() }   
-      steps {
-        sh '''
-          echo " Running tests for PR..."
-          echo "pretend-tests passed"
-        '''
-      }
+    stages {
+        stage('Build Image') {
+            steps {
+                script {
+                    // BUILDING DOCKER CONTAINER  
+                    sh 'docker build -t $ECR_REPO:$IMAGE_TAG .'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    // CI unit test
+                    sh 'docker run --rm $ECR_REPO:$IMAGE_TAG npm test'  // אם אתה עובד עם Node.js למשל
+                }
+            }
+        }
+
+        stage('Push to ECR') {
+            steps {
+                script {
+                    // Connecting to the ECR
+                    sh 'aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO'
+
+                    // pushing the image to the amazon ECR
+                    sh 'docker tag $ECR_REPO:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG'
+                    sh 'docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG'
+                }
+            }
+        }
     }
 
-    stage('CD on master (placeholder)') {
-      when { branch 'master' }  
-      steps {
-        sh '''
-          echo "Deploy placeholder on master (will implement next)"
-        '''
-      }
+    post {
+        always {
+            cleanWs() // לנקות את ה-workspace בסוף
+        }
     }
-  }
-
-  post {
-    always {
-      echo "Pipeline finished for branch: ${env.BRANCH_NAME}"
-    }
-  }
 }
